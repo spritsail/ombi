@@ -1,4 +1,4 @@
-ARG OMBI_VER=3.0.3421
+ARG OMBI_VER=3.0.3477
 
 FROM microsoft/dotnet:2.1-sdk-alpine AS builder
 
