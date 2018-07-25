@@ -60,7 +60,6 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
  && mv ClientApp/styles/Styles.scss ClientApp/styles/styles.scss \
  && npm install \
  && node node_modules/gulp/bin/gulp.js build \
- && dotnet add package ILLink.Tasks -v 0.1.5-preview-1841731 \
  && dotnet publish -c Release -r linux-x64 -o /ombi /p:FullVer=${OMBI_VER} /p:SemVer=${OMBI_VER} \
  && strip -s /ombi/*.so
 
