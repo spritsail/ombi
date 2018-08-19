@@ -6,13 +6,15 @@ ARG OMBI_VER
 
 WORKDIR /tmp/ombi-src
 
-RUN apk add binutils nodejs-npm \
+RUN apk add binutils yarn \
  && wget -O- https://github.com/tidusjar/Ombi/archive/v${OMBI_VER}.tar.gz \
           | tar xz --strip-components=1  \
+    # Apply a patch to fix Linux builds
+ && wget -O- https://github.com/tidusjar/Ombi/commit/94a1f3a00d1c960b9e5d537d15c9b2334e14d6b6.patch | patch -p1 \
  && cd src/Ombi \
  && mv ClientApp/styles/Styles.scss ClientApp/styles/styles.scss \
- && npm install \
- && node node_modules/gulp/bin/gulp.js build \
+ && yarn install --prod \
+ && yarn run publish \
  && dotnet publish -c Release -r linux-musl-x64 -o /ombi /p:FullVer=${OMBI_VER} /p:SemVer=${OMBI_VER} \
  && strip -s /ombi/*.so
 
