@@ -20,7 +20,7 @@ pipeline:
     repo: spritsail/ombi
     tags:
       - 'latest'
-      - '%label: io.spritsail.version.ombi'
+      - '%label io.spritsail.version.ombi'
 
   notify:
     image: spritsail/notify
