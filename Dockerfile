@@ -1,4 +1,4 @@
-ARG OMBI_VER=3.0.4119
+ARG OMBI_VER=3.0.4256
 
 FROM microsoft/dotnet:2.2-sdk-alpine AS builder
 
@@ -32,7 +32,8 @@ LABEL maintainer="Spritsail <ombi@spritsail.io>" \
       org.label-schema.version=${OMBI_VER} \
       io.spritsail.version.ombi=${OMBI_VER}
 
-RUN apk add --no-cache libstdc++ icu-libs libintl libssl1.0
+RUN sed -i '1ihttp://dl-cdn.alpinelinux.org/alpine/v3.8/main' /etc/apk/repositories && \
+    apk add --no-cache libstdc++ icu-libs libintl libssl1.0
 
 COPY --from=builder /ombi /ombi
 
