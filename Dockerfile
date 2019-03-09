@@ -17,7 +17,7 @@ RUN apk add binutils yarn \
 
 # ================
 
-FROM spritsail/alpine:3.8
+FROM spritsail/alpine:3.9
 
 WORKDIR /ombi
 
