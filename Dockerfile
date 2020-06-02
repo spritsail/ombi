@@ -1,23 +1,43 @@
-ARG OMBI_VER=3.0.4892
+ARG OMBI_VER=4.0.344
+ARG OMBI_COMMIT=9991fbd71c941b95dc4137441a6cdc62240329d0
 
-FROM microsoft/dotnet:2.2-sdk-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
 
 ARG OMBI_VER
+ARG OMBI_COMMIT
+
+SHELL ["/bin/sh", "-exc"]
 
 WORKDIR /tmp/ombi-src
 
-RUN apk add binutils yarn \
- && wget -O- https://github.com/tidusjar/Ombi/archive/v${OMBI_VER}.tar.gz \
-          | tar xz --strip-components=1  \
- && cd src/Ombi \
- && yarn install --prod \
- && yarn run publish \
- && dotnet publish -c Release -r linux-musl-x64 -o /ombi /p:FullVer=${OMBI_VER} /p:SemVer=${OMBI_VER} \
- && strip -s /ombi/*.so
+RUN apk add \
+        binutils \
+        g++ \
+        gcc \
+        git \
+        make \
+        python2 \
+        yarn
+
+RUN git clone https://github.com/tidusjar/Ombi.git -b feature/v4 . \
+ && git -c advice.detachedHead=false checkout "${OMBI_COMMIT}"
+
+# Build ClientApp webpack into wwwroot/dist
+WORKDIR /tmp/ombi-src/src/Ombi/ClientApp
+RUN yarn install \
+ && yarn run build --outputPath /ombi/ClientApp/dist
+
+WORKDIR /tmp/ombi-src/src/Ombi
+RUN dotnet publish \
+        -c Release \
+        -r linux-musl-x64 \
+        -o /ombi \
+        /p:FullVer=${OMBI_VER} \
+        /p:SemVer=${OMBI_VER}
 
 # ================
 
-FROM spritsail/alpine:3.9
+FROM spritsail/alpine:3.11
 
 WORKDIR /ombi
 
@@ -32,8 +52,11 @@ LABEL maintainer="Spritsail <ombi@spritsail.io>" \
       org.label-schema.version=${OMBI_VER} \
       io.spritsail.version.ombi=${OMBI_VER}
 
-RUN sed -i '1ihttp://dl-cdn.alpinelinux.org/alpine/v3.8/main' /etc/apk/repositories && \
-    apk add --no-cache libstdc++ icu-libs libintl libssl1.0
+RUN apk add --no-cache \
+        icu-libs \
+        libintl \
+        libssl1.1 \
+        libstdc++
 
 COPY --from=builder /ombi /ombi
 
@@ -41,4 +64,4 @@ EXPOSE 5000
 
 VOLUME ["/config"]
 
-CMD ["/ombi/Ombi", "--storage", "/config"]
+CMD ["/ombi/Ombi", "--storage", "/config", "--host", "http://0.0.0.0:5000;http://[::]:5000"]
