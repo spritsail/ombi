@@ -1,5 +1,5 @@
-ARG OMBI_VER=4.0.344
-ARG OMBI_COMMIT=9991fbd71c941b95dc4137441a6cdc62240329d0
+ARG OMBI_VER=4.0.381
+ARG OMBI_COMMIT=cc5bbd5042e6b394762be40d2046ef29b54f8f04
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
 
@@ -37,7 +37,7 @@ RUN dotnet publish \
 
 # ================
 
-FROM spritsail/alpine:3.11
+FROM spritsail/alpine:3.12
 
 WORKDIR /ombi
 
