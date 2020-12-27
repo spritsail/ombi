@@ -1,5 +1,5 @@
-ARG OMBI_VER=4.0.381
-ARG OMBI_COMMIT=cc5bbd5042e6b394762be40d2046ef29b54f8f04
+ARG OMBI_VER=4.0.779
+ARG OMBI_COMMIT=e6751903a76df66d83d46ce93ed9f3172d8cc459
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
 
@@ -16,7 +16,6 @@ RUN apk add \
         gcc \
         git \
         make \
-        python2 \
         yarn
 
 RUN git clone https://github.com/tidusjar/Ombi.git -b feature/v4 . \
